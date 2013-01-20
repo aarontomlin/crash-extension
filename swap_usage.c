@@ -69,8 +69,10 @@ cmd_swap_usage(void)
 		    "PID     SWAP     COMM\n");
 
 		tc = FIRST_CONTEXT();
-		for (i = 0; i < RUNNING_TASKS(); i++, tc++)
-			show_swap_usage(tc);
+		for (i = 0; i < RUNNING_TASKS(); i++, tc++) {
+			if (!is_kernel_thread(tc->task))
+				show_swap_usage(tc);
+		}
 
 		fprintf(fp, "\n");
 
