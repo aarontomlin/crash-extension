@@ -1,1 +1,0 @@
-gcc -nostartfiles -shared -rdynamic -o swap_rhel6.so swap_usage.c -fPIC -DX86_64
