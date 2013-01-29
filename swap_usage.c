@@ -16,8 +16,12 @@
  */
 
 #include "defs.h"
+
 #define MEMBER_FOUND 1
 #define MEMBER_NOT_FOUND 0
+#define PRINT_HEADER() \
+		fprintf(fp, \
+	"PID     SWAP     COMM\n");
 
 int _init(void);
 int _fini(void);
@@ -110,6 +114,9 @@ cmd_swap_usage(void)
 {
 	struct task_context *tc;
 	int i;
+	int c;
+	ulong value;
+	int subsequent = 0;
 	unsigned int exists = MEMBER_NOT_FOUND;
 
 	if (MEMBER_EXISTS("mm_struct", "_swap_usage")) {
@@ -117,12 +124,55 @@ cmd_swap_usage(void)
 		exists = MEMBER_FOUND;
 	}
 
-	fprintf(fp,
-	    "PID     SWAP     COMM\n");
+	while ((c = getopt(argcnt, args, "")) != EOF) {
+		switch (c) {
+		default:
+			break;
+		}
+	}
 
-	tc = FIRST_CONTEXT();
-	for (i = 0; i < RUNNING_TASKS(); i++, tc++) {
-		if (!is_kernel_thread(tc->task))
-			show_swap_usage(tc, exists);
+        if (!args[optind]) {
+                PRINT_HEADER();
+                tc = FIRST_CONTEXT();
+                for (i = 0; i < RUNNING_TASKS(); i++, tc++) {
+                        if (!is_kernel_thread(tc->task))
+                                show_swap_usage(tc, exists);
+                }   
+		return;
+        }
+
+	PRINT_HEADER();
+	while (args[optind]) {
+		switch (str_to_context(args[optind], &value, &tc)) {
+		case STR_PID:
+			for (tc = pid_to_context(value); tc; tc = tc->tc_next) {
+				if (!is_kernel_thread(tc->task)) {
+					show_swap_usage(tc, exists);
+				} else {
+					error(INFO, "only specify a user task or pid: %s\n",
+						args[optind]);
+				}
+			}
+			break;
+
+		case STR_TASK:
+			for (; tc; tc->tc_next) {
+				if (!is_kernel_thread(tc->task)) {
+					show_swap_usage(tc, exists);
+				} else {
+					error(INFO, "only specify a user task or pid: %s\n",
+						args[optind]);
+				}
+			}
+			break;
+
+		case STR_INVALID:
+			error(INFO, "invalid task or pid value: %s\n",
+				args[optind]);
+			break;
+		}
+
+		subsequent++;
+		optind++;
 	}
 }
