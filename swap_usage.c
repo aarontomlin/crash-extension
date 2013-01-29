@@ -156,7 +156,7 @@ cmd_swap_usage(void)
 			break;
 
 		case STR_TASK:
-			for (; tc; tc->tc_next) {
+			for (; tc; tc = tc->tc_next) {
 				if (!is_kernel_thread(tc->task)) {
 					show_swap_usage(tc, exists);
 				} else {
