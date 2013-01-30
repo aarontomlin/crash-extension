@@ -63,8 +63,8 @@ show_swap_usage(struct task_context *tc, unsigned int exists)
 	ulong vm_next;
 	ulong swap_usage = 0;
 
-	readmem(tc->task + OFFSET(task_struct_mm), KVADDR,
-        &mm, sizeof(void *), "mm_struct mm", FAULT_ON_ERROR);
+	readmem(tc->task + OFFSET(task_struct_mm), KVADDR, &mm,
+		sizeof(void *), "mm_struct mm", FAULT_ON_ERROR);
 
 	if (!mm)
 		return;
@@ -72,27 +72,27 @@ show_swap_usage(struct task_context *tc, unsigned int exists)
 	switch (exists) {
 	case MEMBER_FOUND:
 
-		readmem((mm + swap_usage_offset), KVADDR, 
-		&swap_usage, sizeof(void *), "mm_counter_t", FAULT_ON_ERROR);
+		readmem((mm + swap_usage_offset), KVADDR, &swap_usage,
+			sizeof(void *), "mm_counter_t", FAULT_ON_ERROR);
 
 		break;
 
 	case MEMBER_NOT_FOUND:
 	default:
 
-		readmem(mm + OFFSET(mm_struct_mmap), KVADDR,
-		&vma, sizeof(void *), "mm_struct mmap", FAULT_ON_ERROR);
+		readmem(mm + OFFSET(mm_struct_mmap), KVADDR, &vma,
+			sizeof(void *), "mm_struct mmap", FAULT_ON_ERROR);
 
 		for (; vma; vma = vm_next) {
 
-			readmem(vma + OFFSET(vm_area_struct_vm_start), KVADDR, 
-			&vm_start, sizeof(void *), "vm_area_struct vm_start", FAULT_ON_ERROR);
+			readmem(vma + OFFSET(vm_area_struct_vm_start), KVADDR, &vm_start,
+				sizeof(void *), "vm_area_struct vm_start", FAULT_ON_ERROR);
 
-			readmem(vma + OFFSET(vm_area_struct_vm_end), KVADDR,
-			&vm_end, sizeof(void *), "vm_area_struct vm_end", FAULT_ON_ERROR);
+			readmem(vma + OFFSET(vm_area_struct_vm_end), KVADDR, &vm_end,
+				sizeof(void *), "vm_area_struct vm_end", FAULT_ON_ERROR);
 
-			readmem(vma + OFFSET(vm_area_struct_vm_next), KVADDR,
-			&vm_next, sizeof(void *), "vm_area_struct vm_next", FAULT_ON_ERROR);
+			readmem(vma + OFFSET(vm_area_struct_vm_next), KVADDR, &vm_next,
+				sizeof(void *), "vm_area_struct vm_next", FAULT_ON_ERROR);
 
 			while (vm_start < vm_end) {
 				if (!uvtop(tc, vm_start, &paddr, 0)) {
