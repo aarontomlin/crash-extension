@@ -27,11 +27,12 @@ int _init(void);
 int _fini(void);
 
 void cmd_swap_usage(void);
+char *help_swap_usage[];
 
 static unsigned int swap_usage_offset;
 
 static struct command_table_entry command_table[] = {
-	{ "swap_usage", cmd_swap_usage, NULL, 0 },
+	{ "swap_usage", cmd_swap_usage, help_swap_usage, 0 },
 	{ NULL }
 };
 
@@ -127,9 +128,13 @@ cmd_swap_usage(void)
 	while ((c = getopt(argcnt, args, "")) != EOF) {
 		switch (c) {
 		default:
+			argerrs++;
 			break;
 		}
 	}
+
+	if (argerrs)
+		cmd_usage(pc->curcmd, SYNOPSIS);
 
         if (!args[optind]) {
                 PRINT_HEADER();
@@ -176,3 +181,23 @@ cmd_swap_usage(void)
 		optind++;
 	}
 }
+
+char *help_swap_usage[] = {
+	"swap_usage",
+	"Returns the actual swap consumption of a user process",
+	"[pid | taskp]",
+
+	"  This command obtains the swap consumption (in kilobytes) of a user process.",
+	"  Supported on x86_64 only.",
+	"\nEXAMPLE",
+	"    Show the swap consumption for pid 1288, 1232 and 663:\n",
+	"  	crash> swap_usage 1288 1232 663",
+	"	PID     SWAP     COMM",
+	"	 1288   2100	audispd",
+	"	 1232    188	bluetoothd",
+	"	  663   3384	udevd",
+	"	crash>", 
+	" ",
+	"If no arguments are specified, every user process will be checked.",
+	NULL
+};
