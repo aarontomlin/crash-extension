@@ -26,13 +26,13 @@
 int _init(void);
 int _fini(void);
 
-void cmd_swap_usage(void);
-char *help_swap_usage[];
+void cmd_pswap(void);
+char *help_pswap[];
 
 static unsigned int swap_usage_offset;
 
 static struct command_table_entry command_table[] = {
-	{ "swap_usage", cmd_swap_usage, help_swap_usage, 0 },
+	{ "pswap", cmd_pswap, help_pswap, 0 },
 	{ NULL }
 };
 
@@ -111,7 +111,7 @@ show_swap_usage(struct task_context *tc, unsigned int exists)
 
 
 void
-cmd_swap_usage(void)
+cmd_pswap(void)
 {
 	struct task_context *tc;
 	int i;
@@ -183,7 +183,7 @@ cmd_swap_usage(void)
 }
 
 char *help_swap_usage[] = {
-	"swap_usage",
+	"pswap",
 	"Returns the actual swap consumption of a user process",
 	"[pid | taskp]",
 
@@ -191,7 +191,7 @@ char *help_swap_usage[] = {
 	"  Supported on x86_64 only.",
 	"\nEXAMPLE",
 	"    Show the swap consumption for pid 1288, 1232 and 663:\n",
-	"  	crash> swap_usage 1288 1232 663",
+	"  	crash> pswap 1288 1232 663",
 	"	PID     SWAP     COMM",
 	"	 1288   2100	audispd",
 	"	 1232    188	bluetoothd",
