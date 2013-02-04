@@ -17,6 +17,8 @@
 
 #include "defs.h"
 
+#define DISPLAY_KB      (0x2)
+
 #define MEMBER_FOUND 1
 #define MEMBER_NOT_FOUND 0
 #define PRINT_HEADER() \
@@ -50,7 +52,7 @@ _fini(void)
 }
 
 void
-show_swap_usage(struct task_context *tc, unsigned int exists) 
+show_swap_usage(struct task_context *tc, ulong exists, ulong flag) 
 {
 	struct task_mem_usage task_mem_usage, *tm;
 	tm = &task_mem_usage;
@@ -105,8 +107,11 @@ show_swap_usage(struct task_context *tc, unsigned int exists)
 			}
 		}
 	}
+	if (flag & DISPLAY_KB)
+		swap_usage  <<= (PAGESHIFT()-10);
+
 	fprintf(fp, "%5ld  %5ld\t%s\n",
-	tc->pid, swap_usage  << (PAGESHIFT()-10), tc->comm);
+	tc->pid, swap_usage, tc->comm);
 }
 
 
@@ -117,16 +122,20 @@ cmd_pswap(void)
 	int i;
 	int c;
 	ulong value;
+	ulong flag = 0;
 	int subsequent = 0;
-	unsigned int exists = MEMBER_NOT_FOUND;
+	ulong exists = MEMBER_NOT_FOUND;
 
 	if (MEMBER_EXISTS("mm_struct", "_swap_usage")) {
 		swap_usage_offset = MEMBER_OFFSET("mm_struct", "_swap_usage");
 		exists = MEMBER_FOUND;
 	}
 
-	while ((c = getopt(argcnt, args, "")) != EOF) {
+	while ((c = getopt(argcnt, args, "k")) != EOF) {
 		switch (c) {
+                case 'k':
+                        flag |= DISPLAY_KB;
+                        break;
 		default:
 			argerrs++;
 			break;
@@ -141,7 +150,7 @@ cmd_pswap(void)
                 tc = FIRST_CONTEXT();
                 for (i = 0; i < RUNNING_TASKS(); i++, tc++) {
                         if (!is_kernel_thread(tc->task))
-                                show_swap_usage(tc, exists);
+                                show_swap_usage(tc, exists, flag);
                 }   
 		return;
         }
@@ -152,7 +161,7 @@ cmd_pswap(void)
 		case STR_PID:
 			for (tc = pid_to_context(value); tc; tc = tc->tc_next) {
 				if (!is_kernel_thread(tc->task)) {
-					show_swap_usage(tc, exists);
+					show_swap_usage(tc, exists, flag);
 				} else {
 					error(INFO, "only specify a user task or pid: %s\n",
 						args[optind]);
@@ -163,7 +172,7 @@ cmd_pswap(void)
 		case STR_TASK:
 			for (; tc; tc = tc->tc_next) {
 				if (!is_kernel_thread(tc->task)) {
-					show_swap_usage(tc, exists);
+					show_swap_usage(tc, exists, flag);
 				} else {
 					error(INFO, "only specify a user task or pid: %s\n",
 						args[optind]);
@@ -182,12 +191,13 @@ cmd_pswap(void)
 	}
 }
 
-char *help_swap_usage[] = {
+char *help_pswap[] = {
 	"pswap",
 	"Returns the actual swap consumption of a user process",
-	"[pid | taskp]",
+	"[-k] [pid | taskp]",
 
-	"  This command obtains the swap consumption (in kilobytes) of a user process.",
+	"  This command obtains the swap consumption (in pages) of a user process.",
+        "  The -k option can be used to print in kilobytes."
 	"  Supported on x86_64 only.",
 	"\nEXAMPLE",
 	"    Show the swap consumption for pid 1288, 1232 and 663:\n",
