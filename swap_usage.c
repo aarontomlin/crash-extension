@@ -19,6 +19,33 @@
 
 #define DISPLAY_KB      (0x2)
 
+#ifdef	ARM
+#define _PAGE_FILE	(1 << 2)
+#endif	/* ARM */
+
+#ifdef	X86
+#define _PAGE_FILE	(1 << 6) /* _PAGE_BIT_DIRTY */
+#endif	/* X86 */
+
+#ifdef	X86_64
+/* set in defs.h already */
+#define _PAGE_FILE	0x040
+#endif /* X86_64 */
+
+#ifdef	ALPHA
+#define	_PAGE_FILE	0x80000 /* set:pagecache, unset:swap */
+#endif	/* ALPHA */
+
+#ifdef	IA64
+#define	_PAGE_FILE	(1 << 1) /* see swap & file pte remarks below */
+#endif	/* IA64 */
+
+#ifdef	S390
+#define	_PAGE_FILE	0x601
+#endif	/* S390 */
+
+#define pte_file_present(pte) (pte & _PAGE_FILE)
+
 #define MEMBER_FOUND 1
 #define MEMBER_NOT_FOUND 0
 #define PRINT_HEADER() \
@@ -99,7 +126,7 @@ show_swap_usage(struct task_context *tc, ulong exists, ulong flag)
 			while (vm_start < vm_end) {
 				if (!uvtop(tc, vm_start, &paddr, 0)) {
 
-					if (paddr && !(paddr & _PAGE_FILE)) {
+					if (paddr && !(pte_file_present(paddr))) {
 						swap_usage++;
 					}
 				}
@@ -198,7 +225,7 @@ char *help_pswap[] = {
 
 	"  This command obtains the swap consumption (in pages) of a user process.",
         "  The -k option can be used to print in kilobytes."
-	"  Supported on x86_64 only.",
+	"  Supported on ARM, X86, X86_64, ALPHA, IA64 and S390 only.",
 	"\nEXAMPLE",
 	"    Show the swap consumption for pid 1288, 1232 and 663:\n",
 	"  	crash> pswap 1288 1232 663",
