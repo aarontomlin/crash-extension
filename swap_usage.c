@@ -137,8 +137,8 @@ show_swap_usage(struct task_context *tc, ulong exists, ulong flag)
 	if (flag & DISPLAY_KB)
 		swap_usage  <<= (PAGESHIFT()-10);
 
-	fprintf(fp, "%5ld  %5ld\t%s\n",
-	tc->pid, swap_usage, tc->comm);
+	fprintf(fp, "%5ld  %5ld%s%s\n",
+	tc->pid, swap_usage, (flag & DISPLAY_KB) ? "k\t" : "\t", tc->comm);
 }
 
 
