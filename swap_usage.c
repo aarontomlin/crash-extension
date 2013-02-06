@@ -137,7 +137,7 @@ show_swap_usage(struct task_context *tc, ulong exists, ulong flag)
 	if (flag & DISPLAY_KB)
 		swap_usage  <<= (PAGESHIFT()-10);
 
-	fprintf(fp, "%5ld  %5ld%s%s\n",
+	fprintf(fp, "%5ld  %5ld%s%5s\n",
 	tc->pid, swap_usage, (flag & DISPLAY_KB) ? "k\t" : "\t", tc->comm);
 }
 
@@ -224,17 +224,16 @@ char *help_pswap[] = {
 	"[-k] [pid | taskp]",
 
 	"  This command obtains the swap consumption (in pages) of a user process.",
-        "  The -k option can be used to print in kilobytes."
+        "  The -k option can be used to print in kilobytes.\n"
+	"  If no arguments are specified, every user process will be checked.",
 	"  Supported on ARM, X86, X86_64, ALPHA, IA64 and S390 only.",
 	"\nEXAMPLE",
-	"    Show the swap consumption for pid 1288, 1232 and 663:\n",
-	"  	crash> pswap 1288 1232 663",
-	"	PID     SWAP     COMM",
-	"	 1288   2100	audispd",
-	"	 1232    188	bluetoothd",
-	"	  663   3384	udevd",
-	"	crash>", 
-	" ",
-	"If no arguments are specified, every user process will be checked.",
+	"    Show the swap consumption for pid 1232, 1353 and 2275:\n",
+	"    crash> pswap 1232 1353 2275",
+	"    PID     SWAP     COMM",
+	"     1232     34    auditd",
+	"     1353    526       vi",
+	"     2275  30237    gnome-shell",
+	"    crash>", 
 	NULL
 };
