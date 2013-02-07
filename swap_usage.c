@@ -1,3 +1,4 @@
+
 /* swap-usage.c - Check actual swap consumption for each process
  *
  * Aaron Tomlin <atomlin@redhat.com>
@@ -228,7 +229,7 @@ char *help_pswap[] = {
 	"  If no arguments are specified, every user process will be checked.",
 	"  Supported on ARM, X86, X86_64, ALPHA, IA64 and S390 only.",
 	"\nEXAMPLE",
-	"    Show the swap consumption for pid 1232, 1353 and 2275:\n",
+	"  Show the swap consumption for pid 1232, 1353 and 2275:\n",
 	"    crash> pswap 1232 1353 2275",
 	"    PID     SWAP     COMM",
 	"     1232     34    auditd",
